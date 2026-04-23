@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Secuencias">
     
-    <title>Secuencias Móviles</title>
+    <title>Secuencias de un iPhone</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #000;
             --ios-blur: rgba(30, 30, 30, 0.7);
         }
 
@@ -43,7 +41,7 @@
             overflow: hidden;
         }
 
-        /* UI simulada de iOS */
+        /* UI de iOS */
         #status-bar {
             position: absolute; top: 0; left: 0; width: 100%; height: 47px;
             display: flex; justify-content: space-between; align-items: center;
@@ -63,358 +61,296 @@
             border-radius: 10px; z-index: 100; transition: opacity 0.3s;
         }
 
-        /* MENÚ DE CONTROL */
+        /* MENÚ */
         #menu-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; z-index: 1000; transition: opacity 0.5s ease, visibility 0.5s ease;
+            padding: 20px; z-index: 1000; transition: opacity 0.5s ease;
         }
         #menu-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        .menu-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; }
-        .menu-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 320px; }
+        .menu-grid { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 320px; }
         .btn {
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            color: white; padding: 16px; border-radius: 14px; font-size: 1.05rem;
-            cursor: pointer; transition: background 0.2s;
+            color: white; padding: 16px; border-radius: 14px; font-size: 1.05rem; cursor: pointer;
         }
-        .btn:active { background: rgba(255,255,255,0.3); }
         #btn-volver {
             position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.6); color: white; padding: 12px 24px;
             border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); z-index: 999;
-            opacity: 0; visibility: hidden; transition: opacity 0.5s; backdrop-filter: blur(5px);
+            opacity: 0; visibility: hidden; transition: opacity 0.5s;
         }
         #btn-volver.visible { opacity: 1; visibility: visible; }
 
-        /* ESCENAS (BASE) */
+        /* ESCENAS */
         .scene {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 50;
         }
         .scene.active { opacity: 1; visibility: visible; }
 
-        /* NOTIFICACIONES Y RELOJ */
-        .lock-screen-bg { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding-top: calc(60px + env(safe-area-inset-top)); width: 100%; height: 100%; position: absolute;}
-        .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        .notif-container { margin-top: 20px; padding: 0 15px; height: 65%; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+        /* RELOJ Y NOTIFs */
+        .lock-screen-bg { background: rgba(0,0,0,0.3); backdrop-filter: blur(15px); padding-top: calc(60px + env(safe-area-inset-top)); width: 100%; height: 100%; position: absolute;}
+        .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 20px; }
+        .notif-container { margin-top: 20px; padding: 0 15px; height: 70%; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
         .notification {
-            background: rgba(255, 255, 255, 0.85); color: #000; padding: 12px 15px;
-            border-radius: 18px; transform: translateY(-20px) scale(0.95); opacity: 0;
+            background: rgba(255, 255, 255, 0.88); color: #000; padding: 14px;
+            border-radius: 20px; transform: translateY(-15px); opacity: 0;
             animation: popIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-        .notif-header { font-weight: 600; font-size: 0.8rem; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; opacity: 0.8;}
-        .notif-text { font-size: 0.95rem; font-weight: 500;}
-        @keyframes popIn { to { transform: translateY(0) scale(1); opacity: 1; } }
+        .notif-header { font-weight: 600; font-size: 0.8rem; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+        .notif-text { font-size: 0.9rem; line-height: 1.2; }
+        @keyframes popIn { to { transform: translateY(0); opacity: 1; } }
 
-        /* ALERTA BATERÍA/SISTEMA iOS */
+        /* ALERTAS */
         .ios-alert {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.1);
-            background: rgba(240, 240, 240, 0.9); backdrop-filter: blur(20px);
-            color: black; width: 270px; border-radius: 15px; text-align: center;
-            z-index: 200; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: rgba(242, 242, 242, 0.92); backdrop-filter: blur(25px);
+            color: black; width: 270px; border-radius: 14px; text-align: center;
+            z-index: 200; opacity: 0; visibility: hidden; transition: all 0.3s;
         }
         .ios-alert.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
-        .ios-alert h3 { margin: 20px 0 5px; font-size: 1.05rem; }
-        .ios-alert p { font-size: 0.85rem; margin-bottom: 20px; color: #555; }
-        .ios-alert button { border: none; border-top: 1px solid rgba(0,0,0,0.2); background: none; width: 100%; padding: 15px; color: #007aff; font-size: 1.05rem; cursor: pointer; }
-        .ios-alert .popup-spinner { margin: 10px auto 20px; width: 25px; height: 25px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
+        .ios-alert h3 { margin: 20px 0 5px; font-size: 1.05rem; font-weight: 600; }
+        .ios-alert p { font-size: 0.85rem; margin-bottom: 18px; padding: 0 20px; color: #444; }
+        .ios-alert button { border: none; border-top: 1px solid rgba(0,0,0,0.1); background: none; width: 100%; padding: 14px; color: #007aff; font-size: 1.05rem; font-weight: 600; }
+        .popup-spinner { margin: 10px auto 20px; width: 26px; height: 26px; border: 3px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
 
-        /* CHAT */
+        /* ESCENA CHAT */
         #scene-chat { background: #e5ddd5; }
         .chat-header { background: #f6f6f6; height: calc(90px + env(safe-area-inset-top)); padding-top: calc(45px + env(safe-area-inset-top)); padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; }
-        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; height: calc(100% - 170px - env(safe-area-inset-top)); }
+        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
         .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
         .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #999; }
 
-        /* COLAPSO (Apagar) */
-        #scene-colapso { background: transparent; }
-        .home-grid { padding: calc(60px + env(safe-area-inset-top)) 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; }
-        .app-icon { width: 100%; aspect-ratio: 1; border-radius: 20%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
-        #black-screen-spinner { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition: opacity 0.5s; z-index: 300;}
-        .spinner { width: 35px; height: 35px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
+
+        /* ESCENA COLAPSO */
+        .home-grid { padding: calc(70px + env(safe-area-inset-top)) 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .app-icon { width: 100%; aspect-ratio: 1; border-radius: 22%; background: rgba(255,255,255,0.25); display: flex; justify-content: center; align-items: center; font-size: 1.8rem; }
+        #black-out { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition: 0.5s; z-index: 300;}
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* DESPERTAR */
-        #scene-despertar { background: #000; }
-        #boot-screen { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; z-index: 160; transition: opacity 0.5s; }
-        .apple-logo { font-size: 4rem; color: white; }
-
-        /* LIBERACIÓN (Interactivo) */
-        #scene-secuencia { z-index: 50; }
+        /* REPRODUCTOR LIBERACIÓN */
         .music-app {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 55;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #111;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .album-art { width: 280px; height: 280px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: scale(0.95); display: flex; justify-content: center; align-items: center; font-size: 5rem; color: rgba(255,255,255,0.5);}
-        .album-art.playing { transform: scale(1.05); }
-        .track-info { text-align: center; margin-bottom: 40px; }
-        .track-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
-        .track-artist { font-size: 1rem; color: #aaa; }
-        .play-controls { font-size: 3.5rem; color: white; cursor: pointer; transition: transform 0.1s;}
-        .play-controls:active { transform: scale(0.9); }
+        .album-art { 
+            width: 280px; height: 280px; border-radius: 15px; margin-bottom: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; justify-content: center; align-items: center; font-size: 6rem; color: rgba(255,255,255,0.7);
+            transition: transform 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        .album-art.playing { transform: scale(1.05); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .track-info { text-align: center; margin-bottom: 50px; }
+        .track-title { font-size: 1.6rem; font-weight: 700; }
+        .track-artist { font-size: 1.1rem; color: #888; margin-top: 4px; }
+        .play-btn { font-size: 4rem; cursor: pointer; transition: transform 0.1s; }
+        .play-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
     <div id="iphone-screen">
         <div id="status-bar">
-            <div class="time" id="status-time">07:12</div>
+            <div id="st-time">07:12</div>
             <div class="dynamic-island"></div>
             <div class="icons">
-                <i class="fa-solid fa-signal"></i> 
-                <i class="fa-solid fa-wifi"></i> 
-                <i class="fa-solid fa-battery-empty" id="battery-icon" style="color: #ff3b30;"></i>
-                <i class="fa-solid fa-bolt" id="charging-bolt" style="display: none; color: #34c759; position: absolute; right: -8px; font-size: 0.6rem; top: 50%; transform: translateY(-50%);"></i>
+                <i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> 
+                <i id="st-batt" class="fa-solid fa-battery-empty"></i>
+                <i id="st-bolt" class="fa-solid fa-bolt" style="display:none; color:#34c759; margin-left:2px;"></i>
             </div>
         </div>
 
         <div id="scene-caos" class="scene">
             <div class="lock-screen-bg">
-                <div class="lock-time lock-time-display">07:12</div>
-                <div class="notif-container" id="caos-notif-container"></div>
+                <div class="lock-time">07:12</div>
+                <div class="notif-container" id="notifs-caos"></div>
             </div>
-            <div class="ios-alert" id="caos-battery">
-                <h3>Batería muy baja</h3>
-                <p>Queda un 1% de batería.</p>
-                <button onclick="cerrarAlerta('caos-battery')">Cerrar</button>
+            <div class="ios-alert" id="alert-caos">
+                <h3>Batería baja</h3>
+                <p>Queda un 5% de batería.</p>
+                <button onclick="cerrarAlerta('alert-caos')">Cerrar</button>
             </div>
         </div>
 
         <div id="scene-chat" class="scene">
-            <div class="chat-header">Grupo Amigos</div>
+            <div class="chat-header">La Liada de Anoche 🍻</div>
             <div class="chat-messages">
-                <div class="msg">¿A qué hora quedamos al final?</div>
-                <div class="msg">Yo creo que sobre las 8 nos viene bien a todos, ¿no?</div>
-                <div class="msg">Vale, nos vemos donde siempre.</div>
+                <div class="msg">¿Habéis llegado todos vivos?</div>
+                <div class="msg">Yo sigo en el búho, me quiero morir.</div>
+                <div class="msg">Pasad los vídeos antes de que me arrepienta jajaja.</div>
+                <div class="msg">No vuelvo a salir en mi vida, lo juro.</div>
             </div>
             <div class="chat-input">
                 <div class="input-bar">Mensaje...</div>
-            </div>
-            <div class="ios-alert" id="chat-battery">
-                <h3>Batería muy baja</h3>
-                <p>Queda un 1% de batería.</p>
-                <button onclick="cerrarAlerta('chat-battery')">Cerrar</button>
             </div>
         </div>
 
         <div id="scene-colapso" class="scene">
             <div class="home-grid">
-                <div class="app-icon" style="background: #34c759;"><i class="fa-solid fa-phone"></i></div>
-                <div class="app-icon" style="background: #007aff;"><i class="fa-solid fa-envelope"></i></div>
-                <div class="app-icon" style="background: #ff3b30;"><i class="fa-regular fa-calendar"></i></div>
-                <div class="app-icon" style="background: #ff9500;"><i class="fa-solid fa-camera"></i></div>
-                <div class="app-icon" style="background: #5856d6;"><i class="fa-brands fa-safari"></i></div>
-                <div class="app-icon" style="background: #1c1c1e;"><i class="fa-solid fa-clock"></i></div>
-                <div class="app-icon" style="background: #ffcc00;"><i class="fa-solid fa-note-sticky"></i></div>
-                <div class="app-icon" style="background: #34c759;"><i class="fa-solid fa-message"></i></div>
+                <div class="app-icon" style="background:#34c759"><i class="fa-solid fa-phone"></i></div>
+                <div class="app-icon" style="background:#007aff"><i class="fa-solid fa-message"></i></div>
+                <div class="app-icon" style="background:#ff3b30"><i class="fa-solid fa-music"></i></div>
+                <div class="app-icon" style="background:#ff9500"><i class="fa-solid fa-camera"></i></div>
             </div>
-            <div class="ios-alert" id="colapso-popup">
+            <div class="ios-alert" id="alert-colapso">
                 <h3>Apagando...</h3>
-                <p>Batería agotada (0%)</p>
+                <p>Batería agotada.</p>
                 <div class="popup-spinner"></div>
             </div>
-            <div id="black-screen-spinner">
-                <div class="spinner"></div>
-            </div>
+            <div id="black-out"><div style="width:30px; height:30px; border:3px solid rgba(255,255,255,0.2); border-top-color:#fff; border-radius:50%; animation: spin 1s linear infinite;"></div></div>
         </div>
 
         <div id="scene-despertar" class="scene">
-            <div id="boot-screen"><i class="fa-brands fa-apple apple-logo"></i></div>
-            <div class="lock-screen-bg" id="despertar-lock" style="opacity: 0;">
-                <div class="lock-time lock-time-display">07:15</div>
-                <div class="notif-container" id="despertar-notif-container"></div>
+            <div id="boot" style="position:absolute; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; z-index:100;">
+                <i class="fa-brands fa-apple" style="font-size:4rem;"></i>
+            </div>
+            <div class="lock-screen-bg">
+                <div class="lock-time">07:17</div>
+                <div class="notif-container" id="notifs-despertar"></div>
             </div>
         </div>
 
-        <div id="scene-secuencia" class="scene">
+        <div id="scene-liberacion" class="scene">
             <div class="music-app">
-                <div class="album-art" id="album-cover"><i class="fa-solid fa-music"></i></div>
+                <div class="album-art" id="art"><i class="fa-solid fa-compact-disc"></i></div>
                 <div class="track-info">
-                    <div class="track-title">Pista Desconocida</div>
-                    <div class="track-artist">Artista Desconocido</div>
+                    <div class="track-title">Mi Música</div>
+                    <div class="track-artist">Varios artistas</div>
                 </div>
-                <div class="play-controls"><i class="fa-solid fa-play" id="play-btn"></i></div>
+                <i class="fa-solid fa-play play-btn" id="play"></i>
             </div>
         </div>
 
-        <div class="home-indicator" id="home-indicator"></div>
+        <div class="home-indicator"></div>
 
         <div id="menu-overlay">
-            <div class="menu-title">Selecciona Escena</div>
             <div class="menu-grid">
-                <button class="btn" onclick="iniciar('caos')">1. Caos Estático</button>
-                <button class="btn" onclick="iniciar('chat')">2. El Origen</button>
-                <button class="btn" onclick="iniciar('colapso')">3. Colapso</button>
-                <button class="btn" onclick="iniciar('despertar')">4. Despertar</button>
-                <button class="btn" onclick="iniciar('secuencia')">5. Liberación</button>
+                <button class="btn" onclick="lanzar('caos')">1. Caos Estático (07:12)</button>
+                <button class="btn" onclick="lanzar('chat')">2. El Origen (07:13)</button>
+                <button class="btn" onclick="lanzar('colapso')">3. Colapso (07:15)</button>
+                <button class="btn" onclick="lanzar('despertar')">4. Despertar (07:17)</button>
+                <button class="btn" onclick="lanzar('liberacion')">5. Liberación (07:18)</button>
             </div>
         </div>
 
-        <button id="btn-volver" onclick="mostrarMenu()">Volver al Menú</button>
+        <button id="btn-volver" onclick="reset()">Volver al Menú</button>
     </div>
 
     <script>
-        let intervaloGen;
-        let notifCount = 0;
-        
-        const mensajesGenericos = [
-            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Trabajo: ¿Alguien tiene el informe?' },
-            { app: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', text: 'A usuario_random y 12 más les gusta tu foto.' },
-            { app: '<i class="fa-brands fa-twitter" style="color:#1DA1F2"></i> Twitter', text: 'Tendencia ahora: #UltimaHora' },
-            { app: '<i class="fa-solid fa-envelope" style="color:#007aff"></i> Mail', text: 'Promoción: 50% de descuento solo hoy' },
-            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Amigos: Tenemos que quedar.' }
+        let timer;
+        const pool = [
+            { a: '<i class="fa-solid fa-phone" style="color:#ff3b30"></i> Teléfono', t: "Llamada perdida de Mamá (3)." },
+            { a: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', t: "Bro, pasad las fotos de ayer que no me acuerdo de nada." },
+            { a: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', t: "Alba te ha mencionado en su historia." },
+            { a: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', t: "Menuda liada en la fiesta, ¿quién se llevó mi abrigo?" },
+            { a: '<i class="fa-solid fa-money-bill-transfer" style="color:#007aff"></i> Bizum', t: "Has recibido 5,00€ de Marcos: Lo del kebab de las 5am." },
+            { a: '<i class="fa-brands fa-tiktok"></i> TikTok', t: "Hugo te ha enviado un vídeo: 'Nosotros a las 4 de la mañana'." },
+            { a: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', t: "¿Estáis vivos? Yo acabo de llegar a casa." },
+            { a: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', t: "Mensaje de Sara: jajaja la cara que llevabas." },
+            { a: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', t: "Gente, hay que repetir lo de anoche pero más suave." },
+            { a: '<i class="fa-solid fa-map-location-dot" style="color:#ffcc00"></i> Buscar', t: "Tus amigos han dejado de compartir ubicación." }
         ];
 
-        function solicitarPantallaCompleta() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) { elem.requestFullscreen().catch(()=>{}); }
-            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen().catch(()=>{}); }
-        }
-
-        // Control Interactivo de Música
-        const playBtn = document.getElementById('play-btn');
-        const albumCover = document.getElementById('album-cover');
-        
-        playBtn.addEventListener('click', () => {
-            if (playBtn.classList.contains('fa-play')) {
-                playBtn.classList.replace('fa-play', 'fa-pause');
-                albumCover.classList.add('playing');
-            } else {
-                playBtn.classList.replace('fa-pause', 'fa-play');
-                albumCover.classList.remove('playing');
-            }
-        });
-
-        function actualizarHoraYBateria(escenaId) {
-            const batteryIcon = document.getElementById('battery-icon');
-            const chargingBolt = document.getElementById('charging-bolt');
-            const statusTime = document.getElementById('status-time');
-            const lockTimes = document.querySelectorAll('.lock-time-display');
-
-            if (escenaId === 'despertar' || escenaId === 'secuencia') {
-                statusTime.textContent = '07:15';
-                lockTimes.forEach(el => el.textContent = '07:15');
-                batteryIcon.className = 'fa-solid fa-battery-quarter';
-                batteryIcon.style.color = '#34c759'; // Verde
-                chargingBolt.style.display = 'block';
-            } else {
-                statusTime.textContent = '07:12';
-                lockTimes.forEach(el => el.textContent = '07:12');
-                batteryIcon.className = 'fa-solid fa-battery-empty';
-                batteryIcon.style.color = '#ff3b30'; // Rojo
-                chargingBolt.style.display = 'none';
-            }
-        }
-
-        function iniciar(escenaId) {
-            solicitarPantallaCompleta();
-            
+        function lanzar(id) {
             document.getElementById('menu-overlay').classList.add('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
-            
-            actualizarHoraYBateria(escenaId);
+            document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+            clearInterval(timer);
 
+            const stTime = document.getElementById('st-time');
+            const stBatt = document.getElementById('st-batt');
+            const stBolt = document.getElementById('st-bolt');
             const statusBar = document.getElementById('status-bar');
-            const homeIndicator = document.getElementById('home-indicator');
             
-            // Lógica de Status Bar
-            if(escenaId === 'despertar') {
-                statusBar.style.opacity = '0';
-                homeIndicator.style.opacity = '0';
-            } else if (escenaId === 'colapso') {
-                statusBar.style.opacity = '1';
-                statusBar.style.color = 'white';
-            } else {
-                statusBar.style.opacity = '1';
-                homeIndicator.style.opacity = '1';
-                statusBar.style.color = escenaId === 'chat' ? 'black' : 'white';
-                statusBar.style.textShadow = escenaId === 'chat' ? 'none' : '0 1px 3px rgba(0,0,0,0.5)';
+            // Colores barra superior
+            statusBar.style.color = (id === 'chat') ? 'black' : 'white';
+            statusBar.style.textShadow = (id === 'chat') ? 'none' : '0 1px 3px rgba(0,0,0,0.5)';
+            
+            if(id === 'caos') {
+                stTime.textContent = "07:12";
+                stBatt.className = "fa-solid fa-battery-empty";
+                stBatt.style.color = "#ff3b30";
+                stBolt.style.display = "none";
+                document.getElementById('scene-caos').classList.add('active');
+                llenarNotifs('notifs-caos', 1500, true);
+            } else if(id === 'chat') {
+                stTime.textContent = "07:13";
+                stBatt.className = "fa-solid fa-battery-empty";
+                stBatt.style.color = "#ff3b30";
+                stBolt.style.display = "none";
+                document.getElementById('scene-chat').classList.add('active');
+            } else if(id === 'colapso') {
+                stTime.textContent = "07:15";
+                stBatt.className = "fa-solid fa-battery-empty";
+                stBatt.style.color = "#ff3b30";
+                stBolt.style.display = "none";
+                document.getElementById('scene-colapso').classList.add('active');
+                setTimeout(() => document.getElementById('alert-colapso').classList.add('show'), 800);
+                setTimeout(() => {
+                    document.getElementById('alert-colapso').classList.remove('show');
+                    document.getElementById('black-out').style.visibility = "visible";
+                    document.getElementById('black-out').style.opacity = "1";
+                }, 3000);
+            } else if(id === 'despertar') {
+                stTime.textContent = "07:17";
+                stBatt.className = "fa-solid fa-battery-quarter";
+                stBatt.style.color = "#34c759";
+                stBolt.style.display = "inline-block";
+                document.getElementById('scene-despertar').classList.add('active');
+                setTimeout(() => document.getElementById('boot').style.opacity = "0", 2000);
+                setTimeout(() => llenarNotifs('notifs-despertar', 800, false), 2500);
+            } else if(id === 'liberacion') {
+                stTime.textContent = "07:18";
+                stBatt.className = "fa-solid fa-battery-quarter";
+                stBatt.style.color = "#34c759";
+                stBolt.style.display = "inline-block";
+                document.getElementById('scene-liberacion').classList.add('active');
             }
 
-            // Limpiar todo
-            document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
-            clearInterval(intervaloGen);
-            document.getElementById('caos-notif-container').innerHTML = '';
-            document.getElementById('despertar-notif-container').innerHTML = '';
-            document.getElementById('black-screen-spinner').style.opacity = '0';
-            document.getElementById('black-screen-spinner').style.visibility = 'hidden';
-            document.getElementById('boot-screen').style.opacity = '1';
-            document.getElementById('despertar-lock').style.opacity = '0';
-            
-            // Reset Reproductor Musical
-            playBtn.classList.replace('fa-pause', 'fa-play');
-            albumCover.classList.remove('playing');
-
-            // Mostrar escena elegida
-            document.getElementById(`scene-${escenaId}`).classList.add('active');
-
-            if (escenaId === 'caos') iniciarNotificaciones('caos-notif-container', true);
-            else if (escenaId === 'chat') setTimeout(() => document.getElementById('chat-battery').classList.add('show'), 2000);
-            else if (escenaId === 'colapso') ejecutarColapso();
-            else if (escenaId === 'despertar') ejecutarDespertar();
-
-            setTimeout(() => {
-                document.getElementById('btn-volver').classList.add('visible');
-            }, 3000);
+            setTimeout(() => document.getElementById('btn-volver').classList.add('visible'), 3000);
         }
 
-        function mostrarMenu() {
+        function llenarNotifs(cid, speed, alertar) {
+            let i = 0;
+            const container = document.getElementById(cid);
+            container.innerHTML = "";
+            timer = setInterval(() => {
+                const n = pool[i % pool.length];
+                const div = document.createElement('div');
+                div.className = 'notification';
+                div.innerHTML = `<div class="notif-header">${n.a}</div><div class="notif-text">${n.t}</div>`;
+                container.prepend(div);
+                i++;
+                if(alertar && i === 4) document.getElementById('alert-caos').classList.add('show');
+            }, speed);
+        }
+
+        function reset() {
             document.getElementById('menu-overlay').classList.remove('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
-            cerrarAlerta('caos-battery');
-            cerrarAlerta('chat-battery');
-            cerrarAlerta('colapso-popup');
-            clearInterval(intervaloGen);
-            playBtn.classList.replace('fa-pause', 'fa-play');
-            albumCover.classList.remove('playing');
+            document.getElementById('alert-caos').classList.remove('show');
+            document.getElementById('alert-colapso').classList.remove('show');
+            document.getElementById('black-out').style.opacity = "0";
+            document.getElementById('black-out').style.visibility = "hidden";
+            document.getElementById('boot').style.opacity = "1";
+            clearInterval(timer);
         }
 
         function cerrarAlerta(id) { document.getElementById(id).classList.remove('show'); }
 
-        function iniciarNotificaciones(containerId, mostrarBateria) {
-            document.getElementById('caos-battery').classList.remove('show');
-            notifCount = 0;
-            const container = document.getElementById(containerId);
-            
-            // Intervalo modificado a 2.5 segundos (2500ms)
-            intervaloGen = setInterval(() => {
-                const msg = mensajesGenericos[notifCount % mensajesGenericos.length];
-                const notif = document.createElement('div');
-                notif.className = 'notification';
-                notif.innerHTML = `<div class="notif-header">${msg.app}</div><div class="notif-text">${msg.text}</div>`;
-                container.prepend(notif);
-                
-                notifCount++;
-                if (mostrarBateria && notifCount === 4) {
-                    document.getElementById('caos-battery').classList.add('show');
-                }
-            }, 2500);
-        }
-
-        function ejecutarColapso() {
-            setTimeout(() => { document.getElementById('colapso-popup').classList.add('show'); }, 1000);
-            setTimeout(() => {
-                document.getElementById('colapso-popup').classList.remove('show');
-                document.getElementById('status-bar').style.opacity = '0';
-                document.getElementById('home-indicator').style.opacity = '0';
-                const blackScreen = document.getElementById('black-screen-spinner');
-                blackScreen.style.visibility = 'visible';
-                blackScreen.style.opacity = '1';
-            }, 3500);
-        }
-
-        function ejecutarDespertar() {
-            setTimeout(() => { document.getElementById('boot-screen').style.opacity = '0'; }, 2500);
-            setTimeout(() => {
-                document.getElementById('status-bar').style.opacity = '1';
-                document.getElementById('home-indicator').style.opacity = '1';
-                document.getElementById('despertar-lock').style.opacity = '1';
-                iniciarNotificaciones('despertar-notif-container', false);
-            }, 3000);
-        }
+        const play = document.getElementById('play');
+        const art = document.getElementById('art');
+        play.onclick = () => {
+            if(play.classList.contains('fa-play')) {
+                play.classList.replace('fa-play', 'fa-pause');
+                art.classList.add('playing');
+            } else {
+                play.classList.replace('fa-pause', 'fa-play');
+                art.classList.remove('playing');
+            }
+        };
     </script>
 </body>
 </html>
