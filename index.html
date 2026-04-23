@@ -74,11 +74,18 @@
             background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
             color: white; padding: 16px; border-radius: 14px; font-size: 1.05rem; cursor: pointer;
         }
+
+        /* ZONA INVISIBLE PARA MOSTRAR BOTÓN */
+        #trigger-zona {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 15vh;
+            z-index: 998; display: none;
+        }
+
         #btn-volver {
             position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.6); color: white; padding: 12px 24px;
             border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); z-index: 999;
-            opacity: 0; visibility: hidden; transition: opacity 0.5s;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s;
         }
         #btn-volver.visible { opacity: 1; visibility: visible; }
 
@@ -122,7 +129,6 @@
         .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
         .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #999; }
-
 
         /* ESCENA COLAPSO */
         .home-grid { padding: calc(70px + env(safe-area-inset-top)) 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -185,6 +191,11 @@
             <div class="chat-input">
                 <div class="input-bar">Mensaje...</div>
             </div>
+            <div class="ios-alert" id="alert-chat">
+                <h3>Batería baja</h3>
+                <p>Queda un 5% de batería.</p>
+                <button onclick="cerrarAlerta('alert-chat')">Cerrar</button>
+            </div>
         </div>
 
         <div id="scene-colapso" class="scene">
@@ -235,6 +246,7 @@
             </div>
         </div>
 
+        <div id="trigger-zona"></div>
         <button id="btn-volver" onclick="reset()">Volver al Menú</button>
     </div>
 
@@ -253,9 +265,14 @@
             { a: '<i class="fa-solid fa-map-location-dot" style="color:#ffcc00"></i> Buscar', t: "Tus amigos han dejado de compartir ubicación." }
         ];
 
+        // Mostrar botón volver al pulsar abajo
+        document.getElementById('trigger-zona').onclick = () => {
+            document.getElementById('btn-volver').classList.add('visible');
+        };
+
         function lanzar(id) {
             document.getElementById('menu-overlay').classList.add('hidden');
-            document.getElementById('btn-volver').classList.remove('visible');
+            document.getElementById('trigger-zona').style.display = 'block'; // Activar zona táctil invisible
             document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
             clearInterval(timer);
 
@@ -274,13 +291,14 @@
                 stBatt.style.color = "#ff3b30";
                 stBolt.style.display = "none";
                 document.getElementById('scene-caos').classList.add('active');
-                llenarNotifs('notifs-caos', 1500, true);
+                llenarNotifs('notifs-caos', 2200, true); // Velocidad reducida a 2.2 segundos
             } else if(id === 'chat') {
                 stTime.textContent = "07:13";
                 stBatt.className = "fa-solid fa-battery-empty";
                 stBatt.style.color = "#ff3b30";
                 stBolt.style.display = "none";
                 document.getElementById('scene-chat').classList.add('active');
+                setTimeout(() => document.getElementById('alert-chat').classList.add('show'), 2500); // Añadida alerta de batería
             } else if(id === 'colapso') {
                 stTime.textContent = "07:15";
                 stBatt.className = "fa-solid fa-battery-empty";
@@ -308,8 +326,6 @@
                 stBolt.style.display = "inline-block";
                 document.getElementById('scene-liberacion').classList.add('active');
             }
-
-            setTimeout(() => document.getElementById('btn-volver').classList.add('visible'), 3000);
         }
 
         function llenarNotifs(cid, speed, alertar) {
@@ -330,7 +346,9 @@
         function reset() {
             document.getElementById('menu-overlay').classList.remove('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
+            document.getElementById('trigger-zona').style.display = 'none'; // Desactivar zona invisible
             document.getElementById('alert-caos').classList.remove('show');
+            document.getElementById('alert-chat').classList.remove('show');
             document.getElementById('alert-colapso').classList.remove('show');
             document.getElementById('black-out').style.opacity = "0";
             document.getElementById('black-out').style.visibility = "hidden";
