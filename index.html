@@ -32,7 +32,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Evitar rebotes en iOS */
             overscroll-behavior-y: none; 
         }
 
@@ -40,7 +39,6 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            /* Fondo genérico */
             background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop') center/cover;
             overflow: hidden;
         }
@@ -51,14 +49,14 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 25px; z-index: 100; font-size: 0.9rem; font-weight: 600;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: opacity 0.3s;
-            padding-top: env(safe-area-inset-top); /* Margen para el notch real si lo hay */
+            padding-top: env(safe-area-inset-top);
         }
         .dynamic-island {
             position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 50%;
             transform: translateX(-50%); width: 120px; height: 30px;
             background: #000; border-radius: 20px; z-index: 101;
         }
-        .icons { display: flex; gap: 7px; font-size: 0.8rem; }
+        .icons { display: flex; gap: 7px; font-size: 0.8rem; align-items: center; position: relative;}
         .home-indicator {
             position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
             width: 130px; height: 5px; background: rgba(255,255,255,0.5);
@@ -96,7 +94,7 @@
         }
         .scene.active { opacity: 1; visibility: visible; }
 
-        /* NOTIFICACIONES Y RELOJ (Usado en Caos y Despertar) */
+        /* NOTIFICACIONES Y RELOJ */
         .lock-screen-bg { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding-top: calc(60px + env(safe-area-inset-top)); width: 100%; height: 100%; position: absolute;}
         .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .notif-container { margin-top: 20px; padding: 0 15px; height: 65%; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
@@ -119,7 +117,7 @@
         }
         .ios-alert.show { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
         .ios-alert h3 { margin: 20px 0 5px; font-size: 1.05rem; }
-        .ios-alert p { font-size: 0.85rem; margin-bottom: 20px; }
+        .ios-alert p { font-size: 0.85rem; margin-bottom: 20px; color: #555; }
         .ios-alert button { border: none; border-top: 1px solid rgba(0,0,0,0.2); background: none; width: 100%; padding: 15px; color: #007aff; font-size: 1.05rem; cursor: pointer; }
         .ios-alert .popup-spinner { margin: 10px auto 20px; width: 25px; height: 25px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
 
@@ -128,16 +126,13 @@
         .chat-header { background: #f6f6f6; height: calc(90px + env(safe-area-inset-top)); padding-top: calc(45px + env(safe-area-inset-top)); padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; }
         .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; height: calc(100% - 170px - env(safe-area-inset-top)); }
         .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg.sent { background: #dcf8c6; align-self: flex-end; }
         .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
-        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #333; }
-        .cursor { display: inline-block; width: 2px; height: 1.2em; background: #007aff; vertical-align: middle; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #999; }
 
         /* COLAPSO (Apagar) */
         #scene-colapso { background: transparent; }
         .home-grid { padding: calc(60px + env(safe-area-inset-top)) 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; }
-        .app-icon { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.2); border-radius: 20%; backdrop-filter: blur(5px); }
+        .app-icon { width: 100%; aspect-ratio: 1; border-radius: 20%; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         #black-screen-spinner { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition: opacity 0.5s; z-index: 300;}
         .spinner { width: 35px; height: 35px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -147,42 +142,38 @@
         #boot-screen { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; z-index: 160; transition: opacity 0.5s; }
         .apple-logo { font-size: 4rem; color: white; }
 
-        /* SECUENCIA */
+        /* LIBERACIÓN (Interactivo) */
         #scene-secuencia { z-index: 50; }
-        .control-center {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--ios-blur); backdrop-filter: blur(25px);
-            transform: translateY(-100%); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; justify-content: center; align-items: center; z-index: 60;
-        }
-        .cc-module { background: rgba(255,255,255,0.15); width: 160px; height: 65px; border-radius: 20px; display: flex; align-items: center; padding: 15px; gap: 15px; font-weight: 600; font-size: 1.1rem; }
-        .moon-icon { background: rgba(0,0,0,0.5); border-radius: 50%; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; }
-        .moon-icon.active { background: #5e5ce6; color: white; }
-        
         .music-app {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e;
-            transform: scale(0.9) translateY(50px); opacity: 0; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 55;
         }
-        .album-art { width: 280px; height: 280px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: scale(0.95);}
+        .album-art { width: 280px; height: 280px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: scale(0.95); display: flex; justify-content: center; align-items: center; font-size: 5rem; color: rgba(255,255,255,0.5);}
         .album-art.playing { transform: scale(1.05); }
         .track-info { text-align: center; margin-bottom: 40px; }
         .track-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
         .track-artist { font-size: 1rem; color: #aaa; }
-        .play-controls { font-size: 3rem; color: white; cursor: pointer;}
+        .play-controls { font-size: 3.5rem; color: white; cursor: pointer; transition: transform 0.1s;}
+        .play-controls:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
 
     <div id="iphone-screen">
         <div id="status-bar">
-            <div class="time">07:12</div>
+            <div class="time" id="status-time">07:12</div>
             <div class="dynamic-island"></div>
-            <div class="icons"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-empty" style="color: #ff3b30;"></i></div>
+            <div class="icons">
+                <i class="fa-solid fa-signal"></i> 
+                <i class="fa-solid fa-wifi"></i> 
+                <i class="fa-solid fa-battery-empty" id="battery-icon" style="color: #ff3b30;"></i>
+                <i class="fa-solid fa-bolt" id="charging-bolt" style="display: none; color: #34c759; position: absolute; right: -8px; font-size: 0.6rem; top: 50%; transform: translateY(-50%);"></i>
+            </div>
         </div>
 
         <div id="scene-caos" class="scene">
             <div class="lock-screen-bg">
-                <div class="lock-time">07:12</div>
+                <div class="lock-time lock-time-display">07:12</div>
                 <div class="notif-container" id="caos-notif-container"></div>
             </div>
             <div class="ios-alert" id="caos-battery">
@@ -193,14 +184,14 @@
         </div>
 
         <div id="scene-chat" class="scene">
-            <div class="chat-header">Grupo Familia</div>
+            <div class="chat-header">Grupo Amigos</div>
             <div class="chat-messages">
-                <div class="msg">¿Quién compra el pan hoy?</div>
-                <div class="msg sent">Yo voy luego, no os preocupéis.</div>
-                <div class="msg">Vale, acuérdate de que sea integral.</div>
+                <div class="msg">¿A qué hora quedamos al final?</div>
+                <div class="msg">Yo creo que sobre las 8 nos viene bien a todos, ¿no?</div>
+                <div class="msg">Vale, nos vemos donde siempre.</div>
             </div>
             <div class="chat-input">
-                <div class="input-bar">Perfecto, cojo un par de ba<span class="cursor"></span></div>
+                <div class="input-bar">Mensaje...</div>
             </div>
             <div class="ios-alert" id="chat-battery">
                 <h3>Batería muy baja</h3>
@@ -211,11 +202,18 @@
 
         <div id="scene-colapso" class="scene">
             <div class="home-grid">
-                <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
-                <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
+                <div class="app-icon" style="background: #34c759;"><i class="fa-solid fa-phone"></i></div>
+                <div class="app-icon" style="background: #007aff;"><i class="fa-solid fa-envelope"></i></div>
+                <div class="app-icon" style="background: #ff3b30;"><i class="fa-regular fa-calendar"></i></div>
+                <div class="app-icon" style="background: #ff9500;"><i class="fa-solid fa-camera"></i></div>
+                <div class="app-icon" style="background: #5856d6;"><i class="fa-brands fa-safari"></i></div>
+                <div class="app-icon" style="background: #1c1c1e;"><i class="fa-solid fa-clock"></i></div>
+                <div class="app-icon" style="background: #ffcc00;"><i class="fa-solid fa-note-sticky"></i></div>
+                <div class="app-icon" style="background: #34c759;"><i class="fa-solid fa-message"></i></div>
             </div>
             <div class="ios-alert" id="colapso-popup">
                 <h3>Apagando...</h3>
+                <p>Batería agotada (0%)</p>
                 <div class="popup-spinner"></div>
             </div>
             <div id="black-screen-spinner">
@@ -226,20 +224,17 @@
         <div id="scene-despertar" class="scene">
             <div id="boot-screen"><i class="fa-brands fa-apple apple-logo"></i></div>
             <div class="lock-screen-bg" id="despertar-lock" style="opacity: 0;">
-                <div class="lock-time">07:13</div>
+                <div class="lock-time lock-time-display">07:15</div>
                 <div class="notif-container" id="despertar-notif-container"></div>
             </div>
         </div>
 
         <div id="scene-secuencia" class="scene">
-            <div class="control-center" id="cc-overlay">
-                <div class="cc-module"><div class="moon-icon" id="moon-btn"><i class="fa-solid fa-moon"></i></div><span>Enfoque</span></div>
-            </div>
-            <div class="music-app" id="music-overlay">
-                <div class="album-art" id="album-cover"></div>
+            <div class="music-app">
+                <div class="album-art" id="album-cover"><i class="fa-solid fa-music"></i></div>
                 <div class="track-info">
-                    <div class="track-title">Focus Vibes</div>
-                    <div class="track-artist">Lofi Beats</div>
+                    <div class="track-title">Pista Desconocida</div>
+                    <div class="track-artist">Artista Desconocido</div>
                 </div>
                 <div class="play-controls"><i class="fa-solid fa-play" id="play-btn"></i></div>
             </div>
@@ -248,13 +243,13 @@
         <div class="home-indicator" id="home-indicator"></div>
 
         <div id="menu-overlay">
-            <div class="menu-title">Selecciona Secuencia</div>
+            <div class="menu-title">Selecciona Escena</div>
             <div class="menu-grid">
                 <button class="btn" onclick="iniciar('caos')">1. Caos Estático</button>
                 <button class="btn" onclick="iniciar('chat')">2. El Origen</button>
                 <button class="btn" onclick="iniciar('colapso')">3. Colapso</button>
                 <button class="btn" onclick="iniciar('despertar')">4. Despertar</button>
-                <button class="btn" onclick="iniciar('secuencia')">5. Liberación (Secuencia)</button>
+                <button class="btn" onclick="iniciar('secuencia')">5. Liberación</button>
             </div>
         </div>
 
@@ -265,7 +260,6 @@
         let intervaloGen;
         let notifCount = 0;
         
-        // Mensajes genéricos
         const mensajesGenericos = [
             { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Trabajo: ¿Alguien tiene el informe?' },
             { app: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', text: 'A usuario_random y 12 más les gusta tu foto.' },
@@ -274,11 +268,45 @@
             { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Amigos: Tenemos que quedar.' }
         ];
 
-        // Intentar forzar Fullscreen en navegador normal (si no es PWA)
         function solicitarPantallaCompleta() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) { elem.requestFullscreen().catch(()=>{}); }
             else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen().catch(()=>{}); }
+        }
+
+        // Control Interactivo de Música
+        const playBtn = document.getElementById('play-btn');
+        const albumCover = document.getElementById('album-cover');
+        
+        playBtn.addEventListener('click', () => {
+            if (playBtn.classList.contains('fa-play')) {
+                playBtn.classList.replace('fa-play', 'fa-pause');
+                albumCover.classList.add('playing');
+            } else {
+                playBtn.classList.replace('fa-pause', 'fa-play');
+                albumCover.classList.remove('playing');
+            }
+        });
+
+        function actualizarHoraYBateria(escenaId) {
+            const batteryIcon = document.getElementById('battery-icon');
+            const chargingBolt = document.getElementById('charging-bolt');
+            const statusTime = document.getElementById('status-time');
+            const lockTimes = document.querySelectorAll('.lock-time-display');
+
+            if (escenaId === 'despertar' || escenaId === 'secuencia') {
+                statusTime.textContent = '07:15';
+                lockTimes.forEach(el => el.textContent = '07:15');
+                batteryIcon.className = 'fa-solid fa-battery-quarter';
+                batteryIcon.style.color = '#34c759'; // Verde
+                chargingBolt.style.display = 'block';
+            } else {
+                statusTime.textContent = '07:12';
+                lockTimes.forEach(el => el.textContent = '07:12');
+                batteryIcon.className = 'fa-solid fa-battery-empty';
+                batteryIcon.style.color = '#ff3b30'; // Rojo
+                chargingBolt.style.display = 'none';
+            }
         }
 
         function iniciar(escenaId) {
@@ -287,6 +315,8 @@
             document.getElementById('menu-overlay').classList.add('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
             
+            actualizarHoraYBateria(escenaId);
+
             const statusBar = document.getElementById('status-bar');
             const homeIndicator = document.getElementById('home-indicator');
             
@@ -314,29 +344,17 @@
             document.getElementById('boot-screen').style.opacity = '1';
             document.getElementById('despertar-lock').style.opacity = '0';
             
-            // Reset Secuencia
-            document.getElementById('cc-overlay').style.transform = 'translateY(-100%)';
-            document.getElementById('moon-btn').classList.remove('active');
-            document.getElementById('music-overlay').style.opacity = '0';
-            document.getElementById('music-overlay').style.transform = 'scale(0.9) translateY(50px)';
-            document.getElementById('album-cover').classList.remove('playing');
-            document.getElementById('play-btn').classList.replace('fa-pause', 'fa-play');
+            // Reset Reproductor Musical
+            playBtn.classList.replace('fa-pause', 'fa-play');
+            albumCover.classList.remove('playing');
 
             // Mostrar escena elegida
             document.getElementById(`scene-${escenaId}`).classList.add('active');
 
-            // Ejecutar lógicas específicas
-            if (escenaId === 'caos') {
-                iniciarNotificaciones('caos-notif-container', true);
-            } else if (escenaId === 'chat') {
-                setTimeout(() => document.getElementById('chat-battery').classList.add('show'), 1500);
-            } else if (escenaId === 'colapso') {
-                ejecutarColapso();
-            } else if (escenaId === 'despertar') {
-                ejecutarDespertar();
-            } else if (escenaId === 'secuencia') {
-                arrancarSecuencia();
-            }
+            if (escenaId === 'caos') iniciarNotificaciones('caos-notif-container', true);
+            else if (escenaId === 'chat') setTimeout(() => document.getElementById('chat-battery').classList.add('show'), 2000);
+            else if (escenaId === 'colapso') ejecutarColapso();
+            else if (escenaId === 'despertar') ejecutarDespertar();
 
             setTimeout(() => {
                 document.getElementById('btn-volver').classList.add('visible');
@@ -350,6 +368,8 @@
             cerrarAlerta('chat-battery');
             cerrarAlerta('colapso-popup');
             clearInterval(intervaloGen);
+            playBtn.classList.replace('fa-pause', 'fa-play');
+            albumCover.classList.remove('playing');
         }
 
         function cerrarAlerta(id) { document.getElementById(id).classList.remove('show'); }
@@ -359,6 +379,7 @@
             notifCount = 0;
             const container = document.getElementById(containerId);
             
+            // Intervalo modificado a 2.5 segundos (2500ms)
             intervaloGen = setInterval(() => {
                 const msg = mensajesGenericos[notifCount % mensajesGenericos.length];
                 const notif = document.createElement('div');
@@ -367,19 +388,14 @@
                 container.prepend(notif);
                 
                 notifCount++;
-                if (mostrarBateria && notifCount === 5) {
+                if (mostrarBateria && notifCount === 4) {
                     document.getElementById('caos-battery').classList.add('show');
                 }
-            }, 800);
+            }, 2500);
         }
 
         function ejecutarColapso() {
-            // 1. Sale el popup de "Apagando..."
-            setTimeout(() => {
-                document.getElementById('colapso-popup').classList.add('show');
-            }, 1000);
-
-            // 2. Funde a negro con ruleta
+            setTimeout(() => { document.getElementById('colapso-popup').classList.add('show'); }, 1000);
             setTimeout(() => {
                 document.getElementById('colapso-popup').classList.remove('show');
                 document.getElementById('status-bar').style.opacity = '0';
@@ -387,42 +403,17 @@
                 const blackScreen = document.getElementById('black-screen-spinner');
                 blackScreen.style.visibility = 'visible';
                 blackScreen.style.opacity = '1';
-            }, 3000);
+            }, 3500);
         }
 
         function ejecutarDespertar() {
-            // 1. Manzana (ya está visible). A los 2.5 seg se desvanece
-            setTimeout(() => {
-                document.getElementById('boot-screen').style.opacity = '0';
-            }, 2500);
-
-            // 2. Aparece la pantalla de bloqueo y empiezan notificaciones
+            setTimeout(() => { document.getElementById('boot-screen').style.opacity = '0'; }, 2500);
             setTimeout(() => {
                 document.getElementById('status-bar').style.opacity = '1';
                 document.getElementById('home-indicator').style.opacity = '1';
                 document.getElementById('despertar-lock').style.opacity = '1';
                 iniciarNotificaciones('despertar-notif-container', false);
             }, 3000);
-        }
-
-        function arrancarSecuencia() {
-            const cc = document.getElementById('cc-overlay');
-            const moon = document.getElementById('moon-btn');
-            const music = document.getElementById('music-overlay');
-            const playBtn = document.getElementById('play-btn');
-            const album = document.getElementById('album-cover');
-
-            setTimeout(() => { cc.style.transform = 'translateY(0)'; }, 600);
-            setTimeout(() => { moon.classList.add('active'); }, 1800);
-            setTimeout(() => { cc.style.transform = 'translateY(-100%)'; }, 2800);
-            setTimeout(() => { 
-                music.style.transform = 'scale(1) translateY(0)';
-                music.style.opacity = '1';
-            }, 3500);
-            setTimeout(() => { 
-                playBtn.classList.replace('fa-play', 'fa-pause');
-                album.classList.add('playing');
-            }, 4800);
         }
     </script>
 </body>
