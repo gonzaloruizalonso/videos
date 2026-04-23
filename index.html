@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Secuencias">
+    
     <title>Secuencias Móviles</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -16,7 +20,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            user-select: none; /* Evita que el texto se seleccione por error */
+            user-select: none;
         }
 
         body {
@@ -28,154 +32,84 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            /* Evitar rebotes en iOS */
+            overscroll-behavior-y: none; 
         }
 
-        /* Contenedor principal: El "iPhone" */
         #iphone-screen {
             position: relative;
             width: 100vw;
             height: 100vh;
-            background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1000&auto=format&fit=crop') center/cover;
+            /* Fondo genérico */
+            background: url('https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop') center/cover;
             overflow: hidden;
         }
 
-        /* --- UI DE iOS --- */
+        /* UI simulada de iOS */
         #status-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 25px;
-            z-index: 100;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            transition: opacity 0.3s;
+            position: absolute; top: 0; left: 0; width: 100%; height: 47px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 25px; z-index: 100; font-size: 0.9rem; font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: opacity 0.3s;
+            padding-top: env(safe-area-inset-top); /* Margen para el notch real si lo hay */
         }
         .dynamic-island {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 30px;
-            background: #000;
-            border-radius: 20px;
-            z-index: 101;
+            position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 50%;
+            transform: translateX(-50%); width: 120px; height: 30px;
+            background: #000; border-radius: 20px; z-index: 101;
         }
         .icons { display: flex; gap: 7px; font-size: 0.8rem; }
-        
         .home-indicator {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 130px;
-            height: 5px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 10px;
-            z-index: 100;
-            transition: opacity 0.3s;
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            width: 130px; height: 5px; background: rgba(255,255,255,0.5);
+            border-radius: 10px; z-index: 100; transition: opacity 0.3s;
         }
 
-        /* --- MENÚ DE CONTROL (WEB) --- */
+        /* MENÚ DE CONTROL */
         #menu-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 1000;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; z-index: 1000; transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        #menu-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        #menu-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         .menu-title { font-size: 1.5rem; font-weight: bold; margin-bottom: 30px; }
-        .menu-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 320px; }
         .btn {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-            backdrop-filter: blur(5px);
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: white; padding: 16px; border-radius: 14px; font-size: 1.05rem;
+            cursor: pointer; transition: background 0.2s;
         }
         .btn:active { background: rgba(255,255,255,0.3); }
-
-        /* Botón para volver al menú */
         #btn-volver {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.3);
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.5s;
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.6); color: white; padding: 12px 24px;
+            border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); z-index: 999;
+            opacity: 0; visibility: hidden; transition: opacity 0.5s; backdrop-filter: blur(5px);
         }
         #btn-volver.visible { opacity: 1; visibility: visible; }
 
-        /* --- ESCENAS --- */
+        /* ESCENAS (BASE) */
         .scene {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease;
-            z-index: 50;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s ease; z-index: 50;
         }
         .scene.active { opacity: 1; visibility: visible; }
 
-        /* ESCENA 1: CAOS */
-        #scene-caos { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding-top: 60px; }
+        /* NOTIFICACIONES Y RELOJ (Usado en Caos y Despertar) */
+        .lock-screen-bg { background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); padding-top: calc(60px + env(safe-area-inset-top)); width: 100%; height: 100%; position: absolute;}
         .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-        #notif-container { margin-top: 20px; padding: 0 15px; height: 60%; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+        .notif-container { margin-top: 20px; padding: 0 15px; height: 65%; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
         .notification {
-            background: rgba(255, 255, 255, 0.85);
-            color: #000;
-            padding: 12px 15px;
-            border-radius: 18px;
-            transform: translateY(-20px) scale(0.95);
-            opacity: 0;
+            background: rgba(255, 255, 255, 0.85); color: #000; padding: 12px 15px;
+            border-radius: 18px; transform: translateY(-20px) scale(0.95); opacity: 0;
             animation: popIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-        .notif-header { font-weight: 600; font-size: 0.8rem; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; }
-        .notif-header i { font-size: 1rem; }
-        .notif-text { font-size: 0.95rem; }
+        .notif-header { font-weight: 600; font-size: 0.8rem; margin-bottom: 2px; display: flex; align-items: center; gap: 5px; opacity: 0.8;}
+        .notif-text { font-size: 0.95rem; font-weight: 500;}
         @keyframes popIn { to { transform: translateY(0) scale(1); opacity: 1; } }
 
-        /* ESCENA 2: CHAT */
-        #scene-chat { background: #e5ddd5; }
-        .chat-bg { background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); opacity: 0.1; position: absolute; width:100%; height:100%; z-index:-1;}
-        .chat-header { background: #f6f6f6; height: 90px; padding-top: 45px; padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; display: flex; align-items: center;}
-        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; height: calc(100% - 170px); }
-        .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .msg.sent { background: #dcf8c6; align-self: flex-end; }
-        .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
-        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #333; }
-        .cursor { display: inline-block; width: 2px; height: 1.2em; background: #007aff; vertical-align: middle; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        /* ALERTA BATERÍA iOS */
+        /* ALERTA BATERÍA/SISTEMA iOS */
         .ios-alert {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(1.1);
             background: rgba(240, 240, 240, 0.9); backdrop-filter: blur(20px);
@@ -187,21 +121,36 @@
         .ios-alert h3 { margin: 20px 0 5px; font-size: 1.05rem; }
         .ios-alert p { font-size: 0.85rem; margin-bottom: 20px; }
         .ios-alert button { border: none; border-top: 1px solid rgba(0,0,0,0.2); background: none; width: 100%; padding: 15px; color: #007aff; font-size: 1.05rem; cursor: pointer; }
+        .ios-alert .popup-spinner { margin: 10px auto 20px; width: 25px; height: 25px; border: 2px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
 
-        /* ESCENA 3: COLAPSO */
-        #scene-colapso { background: #000; display: flex; justify-content: center; align-items: center; z-index: 150; }
+        /* CHAT */
+        #scene-chat { background: #e5ddd5; }
+        .chat-header { background: #f6f6f6; height: calc(90px + env(safe-area-inset-top)); padding-top: calc(45px + env(safe-area-inset-top)); padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; }
+        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; height: calc(100% - 170px - env(safe-area-inset-top)); }
+        .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg.sent { background: #dcf8c6; align-self: flex-end; }
+        .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
+        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #333; }
+        .cursor { display: inline-block; width: 2px; height: 1.2em; background: #007aff; vertical-align: middle; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* COLAPSO (Apagar) */
+        #scene-colapso { background: transparent; }
+        .home-grid { padding: calc(60px + env(safe-area-inset-top)) 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 15px; }
+        .app-icon { width: 100%; aspect-ratio: 1; background: rgba(255,255,255,0.2); border-radius: 20%; backdrop-filter: blur(5px); }
+        #black-screen-spinner { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition: opacity 0.5s; z-index: 300;}
         .spinner { width: 35px; height: 35px; border: 3px solid rgba(255,255,255,0.2); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ESCENA 4: DESPERTAR */
-        #scene-despertar { background: #000; display: flex; justify-content: center; align-items: center; z-index: 150; }
+        /* DESPERTAR */
+        #scene-despertar { background: #000; }
+        #boot-screen { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; z-index: 160; transition: opacity 0.5s; }
         .apple-logo { font-size: 4rem; color: white; }
 
-        /* ESCENA 5: SECUENCIA */
+        /* SECUENCIA */
         #scene-secuencia { z-index: 50; }
         .control-center {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--ios-blur); backdrop-filter: blur(25px);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--ios-blur); backdrop-filter: blur(25px);
             transform: translateY(-100%); transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; justify-content: center; align-items: center; z-index: 60;
         }
@@ -210,17 +159,16 @@
         .moon-icon.active { background: #5e5ce6; color: white; }
         
         .music-app {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #1c1c1e; transform: scale(0.9) translateY(50px); opacity: 0;
-            transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e;
+            transform: scale(0.9) translateY(50px); opacity: 0; transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 55;
         }
-        .album-art { width: 280px; height: 280px; background: url('https://images.unsplash.com/photo-1465101162946-4377e57745c3?q=80&w=600&auto=format&fit=crop') center/cover; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: scale(0.95);}
+        .album-art { width: 280px; height: 280px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; margin-bottom: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); transform: scale(0.95);}
         .album-art.playing { transform: scale(1.05); }
         .track-info { text-align: center; margin-bottom: 40px; }
         .track-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 5px; }
         .track-artist { font-size: 1rem; color: #aaa; }
-        .play-controls { font-size: 3rem; color: white; }
+        .play-controls { font-size: 3rem; color: white; cursor: pointer;}
     </style>
 </head>
 <body>
@@ -229,39 +177,59 @@
         <div id="status-bar">
             <div class="time">07:12</div>
             <div class="dynamic-island"></div>
-            <div class="icons"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-three-quarters"></i></div>
+            <div class="icons"><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-empty" style="color: #ff3b30;"></i></div>
         </div>
 
         <div id="scene-caos" class="scene">
-            <div class="lock-time">07:12</div>
-            <div id="notif-container"></div>
+            <div class="lock-screen-bg">
+                <div class="lock-time">07:12</div>
+                <div class="notif-container" id="caos-notif-container"></div>
+            </div>
             <div class="ios-alert" id="caos-battery">
-                <h3>Batería baja</h3>
-                <p>Queda un 20% de batería.</p>
+                <h3>Batería muy baja</h3>
+                <p>Queda un 1% de batería.</p>
                 <button onclick="cerrarAlerta('caos-battery')">Cerrar</button>
             </div>
         </div>
 
         <div id="scene-chat" class="scene">
-            <div class="chat-bg"></div>
-            <div class="chat-header">Grupo de colegas</div>
+            <div class="chat-header">Grupo Familia</div>
             <div class="chat-messages">
-                <div class="msg">Este grupo para qué es?</div>
-                <div class="msg sent">Este es un grupo para hablar del lunes en Warner</div>
-                <div class="msg">Halloween Factory</div>
+                <div class="msg">¿Quién compra el pan hoy?</div>
+                <div class="msg sent">Yo voy luego, no os preocupéis.</div>
+                <div class="msg">Vale, acuérdate de que sea integral.</div>
             </div>
             <div class="chat-input">
-                <div class="input-bar">Yo creo que sobre las <span class="cursor"></span></div>
+                <div class="input-bar">Perfecto, cojo un par de ba<span class="cursor"></span></div>
             </div>
             <div class="ios-alert" id="chat-battery">
-                <h3>Batería baja</h3>
-                <p>Queda un 10% de batería.</p>
+                <h3>Batería muy baja</h3>
+                <p>Queda un 1% de batería.</p>
                 <button onclick="cerrarAlerta('chat-battery')">Cerrar</button>
             </div>
         </div>
 
-        <div id="scene-colapso" class="scene"><div class="spinner"></div></div>
-        <div id="scene-despertar" class="scene"><i class="fa-brands fa-apple apple-logo"></i></div>
+        <div id="scene-colapso" class="scene">
+            <div class="home-grid">
+                <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
+                <div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div><div class="app-icon"></div>
+            </div>
+            <div class="ios-alert" id="colapso-popup">
+                <h3>Apagando...</h3>
+                <div class="popup-spinner"></div>
+            </div>
+            <div id="black-screen-spinner">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div id="scene-despertar" class="scene">
+            <div id="boot-screen"><i class="fa-brands fa-apple apple-logo"></i></div>
+            <div class="lock-screen-bg" id="despertar-lock" style="opacity: 0;">
+                <div class="lock-time">07:13</div>
+                <div class="notif-container" id="despertar-notif-container"></div>
+            </div>
+        </div>
 
         <div id="scene-secuencia" class="scene">
             <div class="control-center" id="cc-overlay">
@@ -270,14 +238,14 @@
             <div class="music-app" id="music-overlay">
                 <div class="album-art" id="album-cover"></div>
                 <div class="track-info">
-                    <div class="track-title">Sparkle</div>
-                    <div class="track-artist">RADWIMPS</div>
+                    <div class="track-title">Focus Vibes</div>
+                    <div class="track-artist">Lofi Beats</div>
                 </div>
                 <div class="play-controls"><i class="fa-solid fa-play" id="play-btn"></i></div>
             </div>
         </div>
 
-        <div class="home-indicator"></div>
+        <div class="home-indicator" id="home-indicator"></div>
 
         <div id="menu-overlay">
             <div class="menu-title">Selecciona Secuencia</div>
@@ -294,15 +262,19 @@
     </div>
 
     <script>
-        let caosInterval;
+        let intervaloGen;
         let notifCount = 0;
-        const mensajesCaos = [
-            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Este grupo para qué es?' },
-            { app: '<i class="fa-brands fa-tiktok"></i> TikTok', text: 'Nuevas interacciones en @coastergrapher' },
-            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Halloween Factory' },
-            { app: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', text: 'A 5 personas les ha gustado tu historia' }
+        
+        // Mensajes genéricos
+        const mensajesGenericos = [
+            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Trabajo: ¿Alguien tiene el informe?' },
+            { app: '<i class="fa-brands fa-instagram" style="color:#E1306C"></i> Instagram', text: 'A usuario_random y 12 más les gusta tu foto.' },
+            { app: '<i class="fa-brands fa-twitter" style="color:#1DA1F2"></i> Twitter', text: 'Tendencia ahora: #UltimaHora' },
+            { app: '<i class="fa-solid fa-envelope" style="color:#007aff"></i> Mail', text: 'Promoción: 50% de descuento solo hoy' },
+            { app: '<i class="fa-brands fa-whatsapp" style="color:#25D366"></i> WhatsApp', text: 'Amigos: Tenemos que quedar.' }
         ];
 
+        // Intentar forzar Fullscreen en navegador normal (si no es PWA)
         function solicitarPantallaCompleta() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) { elem.requestFullscreen().catch(()=>{}); }
@@ -312,25 +284,35 @@
         function iniciar(escenaId) {
             solicitarPantallaCompleta();
             
-            // Ocultar menú
             document.getElementById('menu-overlay').classList.add('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
             
-            // Apagar status bar en colapso y despertar
             const statusBar = document.getElementById('status-bar');
-            if(escenaId === 'colapso' || escenaId === 'despertar') {
+            const homeIndicator = document.getElementById('home-indicator');
+            
+            // Lógica de Status Bar
+            if(escenaId === 'despertar') {
                 statusBar.style.opacity = '0';
+                homeIndicator.style.opacity = '0';
+            } else if (escenaId === 'colapso') {
+                statusBar.style.opacity = '1';
+                statusBar.style.color = 'white';
             } else {
                 statusBar.style.opacity = '1';
-                // En secuencia, los iconos son blancos. En chat, negros
+                homeIndicator.style.opacity = '1';
                 statusBar.style.color = escenaId === 'chat' ? 'black' : 'white';
                 statusBar.style.textShadow = escenaId === 'chat' ? 'none' : '0 1px 3px rgba(0,0,0,0.5)';
             }
 
-            // Limpiar y activar escena
+            // Limpiar todo
             document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
-            clearInterval(caosInterval);
-            document.getElementById('notif-container').innerHTML = '';
+            clearInterval(intervaloGen);
+            document.getElementById('caos-notif-container').innerHTML = '';
+            document.getElementById('despertar-notif-container').innerHTML = '';
+            document.getElementById('black-screen-spinner').style.opacity = '0';
+            document.getElementById('black-screen-spinner').style.visibility = 'hidden';
+            document.getElementById('boot-screen').style.opacity = '1';
+            document.getElementById('despertar-lock').style.opacity = '0';
             
             // Reset Secuencia
             document.getElementById('cc-overlay').style.transform = 'translateY(-100%)';
@@ -340,14 +322,22 @@
             document.getElementById('album-cover').classList.remove('playing');
             document.getElementById('play-btn').classList.replace('fa-pause', 'fa-play');
 
-            // Mostrar escena
+            // Mostrar escena elegida
             document.getElementById(`scene-${escenaId}`).classList.add('active');
 
-            if (escenaId === 'caos') iniciarCaos();
-            else if (escenaId === 'chat') setTimeout(() => document.getElementById('chat-battery').classList.add('show'), 1500);
-            else if (escenaId === 'secuencia') arrancarSecuencia();
+            // Ejecutar lógicas específicas
+            if (escenaId === 'caos') {
+                iniciarNotificaciones('caos-notif-container', true);
+            } else if (escenaId === 'chat') {
+                setTimeout(() => document.getElementById('chat-battery').classList.add('show'), 1500);
+            } else if (escenaId === 'colapso') {
+                ejecutarColapso();
+            } else if (escenaId === 'despertar') {
+                ejecutarDespertar();
+            } else if (escenaId === 'secuencia') {
+                arrancarSecuencia();
+            }
 
-            // Mostrar botón de volver después de un rato para no interrumpir
             setTimeout(() => {
                 document.getElementById('btn-volver').classList.add('visible');
             }, 3000);
@@ -356,30 +346,63 @@
         function mostrarMenu() {
             document.getElementById('menu-overlay').classList.remove('hidden');
             document.getElementById('btn-volver').classList.remove('visible');
-            if (document.fullscreenElement) { document.exitFullscreen().catch(()=>{}); }
+            cerrarAlerta('caos-battery');
+            cerrarAlerta('chat-battery');
+            cerrarAlerta('colapso-popup');
+            clearInterval(intervaloGen);
         }
 
-        function cerrarAlerta(id) {
-            document.getElementById(id).classList.remove('show');
-        }
+        function cerrarAlerta(id) { document.getElementById(id).classList.remove('show'); }
 
-        function iniciarCaos() {
+        function iniciarNotificaciones(containerId, mostrarBateria) {
             document.getElementById('caos-battery').classList.remove('show');
             notifCount = 0;
-            const container = document.getElementById('notif-container');
+            const container = document.getElementById(containerId);
             
-            caosInterval = setInterval(() => {
-                const msg = mensajesCaos[notifCount % mensajesCaos.length];
+            intervaloGen = setInterval(() => {
+                const msg = mensajesGenericos[notifCount % mensajesGenericos.length];
                 const notif = document.createElement('div');
                 notif.className = 'notification';
                 notif.innerHTML = `<div class="notif-header">${msg.app}</div><div class="notif-text">${msg.text}</div>`;
                 container.prepend(notif);
                 
                 notifCount++;
-                if (notifCount === 5) {
+                if (mostrarBateria && notifCount === 5) {
                     document.getElementById('caos-battery').classList.add('show');
                 }
             }, 800);
+        }
+
+        function ejecutarColapso() {
+            // 1. Sale el popup de "Apagando..."
+            setTimeout(() => {
+                document.getElementById('colapso-popup').classList.add('show');
+            }, 1000);
+
+            // 2. Funde a negro con ruleta
+            setTimeout(() => {
+                document.getElementById('colapso-popup').classList.remove('show');
+                document.getElementById('status-bar').style.opacity = '0';
+                document.getElementById('home-indicator').style.opacity = '0';
+                const blackScreen = document.getElementById('black-screen-spinner');
+                blackScreen.style.visibility = 'visible';
+                blackScreen.style.opacity = '1';
+            }, 3000);
+        }
+
+        function ejecutarDespertar() {
+            // 1. Manzana (ya está visible). A los 2.5 seg se desvanece
+            setTimeout(() => {
+                document.getElementById('boot-screen').style.opacity = '0';
+            }, 2500);
+
+            // 2. Aparece la pantalla de bloqueo y empiezan notificaciones
+            setTimeout(() => {
+                document.getElementById('status-bar').style.opacity = '1';
+                document.getElementById('home-indicator').style.opacity = '1';
+                document.getElementById('despertar-lock').style.opacity = '1';
+                iniciarNotificaciones('despertar-notif-container', false);
+            }, 3000);
         }
 
         function arrancarSecuencia() {
@@ -395,7 +418,6 @@
             setTimeout(() => { 
                 music.style.transform = 'scale(1) translateY(0)';
                 music.style.opacity = '1';
-                document.getElementById('status-bar').style.color = 'white'; // Asegurar color en app de música
             }, 3500);
             setTimeout(() => { 
                 playBtn.classList.replace('fa-play', 'fa-pause');
