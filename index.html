@@ -41,22 +41,16 @@
             overflow: hidden;
         }
 
-        /* UI de iOS */
+        /* UI de iOS SIN NOTCH Y MÁS ARRIBA */
         #status-bar {
-            position: absolute; top: 0; left: 0; width: 100%; height: 47px;
+            position: absolute; top: 3px; left: 0; width: 100%; height: 25px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 25px; z-index: 100; font-size: 0.9rem; font-weight: 600;
+            padding: 0 20px; z-index: 100; font-size: 0.9rem; font-weight: 600;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: opacity 0.5s ease;
-            padding-top: env(safe-area-inset-top);
-        }
-        .dynamic-island {
-            position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 50%;
-            transform: translateX(-50%); width: 120px; height: 30px;
-            background: #000; border-radius: 20px; z-index: 101;
         }
         .icons { display: flex; gap: 7px; font-size: 0.8rem; align-items: center; position: relative;}
         .home-indicator {
-            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
             width: 130px; height: 5px; background: rgba(255,255,255,0.5);
             border-radius: 10px; z-index: 100; transition: opacity 0.5s ease;
         }
@@ -77,10 +71,8 @@
         }
         .btn:active { transform: scale(0.98); }
         .btn-primary {
-            background: rgba(0, 122, 255, 0.4);
-            border-color: #007aff;
-            font-weight: bold;
-            margin-bottom: 10px;
+            background: rgba(0, 122, 255, 0.4); border-color: #007aff;
+            font-weight: bold; margin-bottom: 10px;
         }
 
         /* ZONA INVISIBLE PARA MOSTRAR BOTÓN */
@@ -105,8 +97,8 @@
         .scene.active { opacity: 1; visibility: visible; }
 
         /* RELOJ Y NOTIFs */
-        .lock-screen-bg { background: rgba(0,0,0,0.3); backdrop-filter: blur(15px); padding-top: calc(60px + env(safe-area-inset-top)); width: 100%; height: 100%; position: absolute;}
-        .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 20px; }
+        .lock-screen-bg { background: rgba(0,0,0,0.3); backdrop-filter: blur(15px); padding-top: 40px; width: 100%; height: 100%; position: absolute;}
+        .lock-time { text-align: center; font-size: 5.5rem; font-weight: 200; margin-top: 10px; }
         .notif-container { margin-top: 20px; padding: 0 15px; height: 70%; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
         .notification {
             background: rgba(255, 255, 255, 0.88); color: #000; padding: 14px;
@@ -130,16 +122,32 @@
         .ios-alert button { border: none; border-top: 1px solid rgba(0,0,0,0.1); background: none; width: 100%; padding: 14px; color: #007aff; font-size: 1.05rem; font-weight: 600; }
         .popup-spinner { margin: 10px auto 20px; width: 26px; height: 26px; border: 3px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
 
-        /* ESCENA CHAT */
+        /* ESCENA CHAT CON TECLADO ABIERTO */
         #scene-chat { background: #e5ddd5; }
-        .chat-header { background: #f6f6f6; height: calc(90px + env(safe-area-inset-top)); padding-top: calc(45px + env(safe-area-inset-top)); padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; }
-        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .chat-header { background: #f6f6f6; height: 75px; padding-top: 35px; padding-left: 15px; color: black; font-weight: 600; border-bottom: 1px solid #ddd; }
+        /* Mensajes empujados hacia arriba por el teclado */
+        .chat-messages { padding: 15px; display: flex; flex-direction: column; gap: 10px; height: calc(100% - 75px - 60px - 260px); justify-content: flex-end;}
         .msg { background: white; color: black; padding: 10px 15px; border-radius: 15px; max-width: 75%; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .chat-input { height: 80px; background: #f6f6f6; position: absolute; bottom: 0; width: 100%; display: flex; align-items: center; padding: 0 15px 20px; }
-        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 10px 15px; color: #999; }
+        
+        /* Input y teclado de iOS */
+        .chat-input { height: 60px; background: #f6f6f6; position: absolute; bottom: 260px; width: 100%; display: flex; align-items: center; padding: 0 15px; border-top: 1px solid #ddd; z-index: 91;}
+        .input-bar { flex-grow: 1; background: white; border-radius: 20px; border: 1px solid #ddd; padding: 8px 15px; color: #000; font-size: 0.95rem; display: flex; align-items: center;}
+        .cursor { display: inline-block; width: 2px; height: 1.2em; background: #007aff; vertical-align: middle; animation: blink 1s infinite; margin-left: 2px;}
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .ios-keyboard {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 260px;
+            background: #d1d5db; z-index: 90; padding: 10px 4px 30px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .kb-row { display: flex; justify-content: center; gap: 6px; }
+        .kb-key { background: #fff; height: 42px; border-radius: 5px; flex-grow: 1; max-width: 32px; box-shadow: 0 1px 1px rgba(0,0,0,0.3); }
+        .kb-key.action { background: #b0b4ba; max-width: 42px; }
+        .kb-key.space { max-width: 170px; }
+        .kb-row-2 { padding: 0 18px; }
 
         /* ESCENA COLAPSO */
-        .home-grid { padding: calc(70px + env(safe-area-inset-top)) 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .home-grid { padding: 50px 25px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .app-icon { width: 100%; aspect-ratio: 1; border-radius: 22%; background: rgba(255,255,255,0.25); display: flex; justify-content: center; align-items: center; font-size: 1.8rem; }
         #black-out { position: absolute; top:0; left:0; width:100%; height:100%; background:black; display:flex; justify-content:center; align-items:center; opacity:0; visibility:hidden; transition: 0.5s; z-index: 300;}
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -168,7 +176,6 @@
     <div id="iphone-screen">
         <div id="status-bar">
             <div id="st-time">07:12</div>
-            <div class="dynamic-island"></div>
             <div class="icons">
                 <i class="fa-solid fa-signal"></i> <i class="fa-solid fa-wifi"></i> 
                 <i id="st-batt" class="fa-solid fa-battery-empty"></i>
@@ -192,12 +199,34 @@
             <div class="chat-header">La Liada de Anoche 🍻</div>
             <div class="chat-messages">
                 <div class="msg">¿Habéis llegado todos vivos?</div>
-                <div class="msg">Yo sigo en el búho, me quiero morir.</div>
                 <div class="msg">Pasad los vídeos antes de que me arrepienta jajaja.</div>
                 <div class="msg">No vuelvo a salir en mi vida, lo juro.</div>
             </div>
             <div class="chat-input">
-                <div class="input-bar">Mensaje...</div>
+                <div class="input-bar">Yo creo que si<span class="cursor"></span></div>
+            </div>
+            
+            <div class="ios-keyboard">
+                <div class="kb-row">
+                    <div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div>
+                </div>
+                <div class="kb-row kb-row-2">
+                    <div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div>
+                </div>
+                <div class="kb-row">
+                    <div class="kb-key action"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key"></div><div class="kb-key action"></div>
+                </div>
+                <div class="kb-row">
+                    <div class="kb-key action" style="max-width: 85px;"></div>
+                    <div class="kb-key space"></div>
+                    <div class="kb-key action" style="max-width: 85px;"></div>
+                </div>
+            </div>
+
+            <div class="ios-alert" id="alert-chat">
+                <h3>Batería baja</h3>
+                <p>Queda un 5% de batería.</p>
+                <button onclick="cerrarAlerta('alert-chat')">Cerrar</button>
             </div>
         </div>
 
@@ -242,7 +271,6 @@
         <div id="menu-overlay">
             <div class="menu-grid">
                 <button class="btn btn-primary" onclick="solicitarPantallaCompleta()"><i class="fa-solid fa-expand"></i> Activar Pantalla Completa</button>
-                
                 <button class="btn" onclick="lanzar('caos')">1. Caos Estático (07:12)</button>
                 <button class="btn" onclick="lanzar('chat')">2. El Origen (07:13)</button>
                 <button class="btn" onclick="lanzar('colapso')">3. Colapso (07:15)</button>
@@ -270,7 +298,6 @@
             { a: '<i class="fa-solid fa-map-location-dot" style="color:#ffcc00"></i> Buscar', t: "Tus amigos han dejado de compartir ubicación." }
         ];
 
-        // Función para forzar pantalla completa
         function solicitarPantallaCompleta() {
             const elem = document.documentElement;
             if (!document.fullscreenElement) {
@@ -282,7 +309,6 @@
             }
         }
 
-        // Mostrar botón volver al pulsar abajo (zona invisible)
         document.getElementById('trigger-zona').onclick = () => {
             document.getElementById('btn-volver').classList.add('visible');
         };
@@ -299,11 +325,9 @@
             const statusBar = document.getElementById('status-bar');
             const homeIndicator = document.querySelector('.home-indicator');
             
-            // Restablecer visibilidad interfaz base
             statusBar.style.opacity = '1';
-            homeIndicator.style.opacity = '1';
+            homeIndicator.style.opacity = (id === 'chat') ? '0' : '1'; // Oculto el home indicator si está el teclado abierto
             
-            // Colores barra superior
             statusBar.style.color = (id === 'chat') ? 'black' : 'white';
             statusBar.style.textShadow = (id === 'chat') ? 'none' : '0 1px 3px rgba(0,0,0,0.5)';
             
@@ -321,6 +345,9 @@
                 stBatt.style.color = "#ff3b30";
                 stBolt.style.display = "none";
                 document.getElementById('scene-chat').classList.add('active');
+                
+                // Activar la alerta de batería a los 2.5 segundos
+                setTimeout(() => document.getElementById('alert-chat').classList.add('show'), 2500);
             
             } else if(id === 'colapso') {
                 stTime.textContent = "07:15";
@@ -333,8 +360,6 @@
                     document.getElementById('alert-colapso').classList.remove('show');
                     document.getElementById('black-out').style.visibility = "visible";
                     document.getElementById('black-out').style.opacity = "1";
-                    
-                    // Ocultar barra superior e indicador en pantalla negra
                     statusBar.style.opacity = '0';
                     homeIndicator.style.opacity = '0';
                 }, 3000);
@@ -346,7 +371,6 @@
                 stBolt.style.display = "inline-block";
                 document.getElementById('scene-despertar').classList.add('active');
                 
-                // Ocultar barras de sistema durante la manzana
                 statusBar.style.opacity = '0';
                 homeIndicator.style.opacity = '0';
                 document.getElementById('boot').style.opacity = '1';
@@ -356,7 +380,6 @@
                 }, 2000);
                 
                 setTimeout(() => {
-                    // Restaurar barras de sistema al mostrar notificaciones
                     statusBar.style.opacity = '1';
                     homeIndicator.style.opacity = '1';
                     llenarNotifs('notifs-despertar', 800, false);
@@ -391,11 +414,11 @@
             document.getElementById('btn-volver').classList.remove('visible');
             document.getElementById('trigger-zona').style.display = 'none'; 
             document.getElementById('alert-caos').classList.remove('show');
+            document.getElementById('alert-chat').classList.remove('show');
             document.getElementById('alert-colapso').classList.remove('show');
             document.getElementById('black-out').style.opacity = "0";
             document.getElementById('black-out').style.visibility = "hidden";
             
-            // Restaurar barra y home indicator al volver
             document.getElementById('status-bar').style.opacity = '1';
             document.querySelector('.home-indicator').style.opacity = '1';
             document.getElementById('boot').style.opacity = "1";
